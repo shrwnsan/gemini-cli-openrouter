@@ -110,9 +110,22 @@ This is primarily a **consumption fork** that stays in sync with upstream. For c
 
 See [CONTRIBUTING.md](./CONTRIBUTING.md) for general guidelines.
 
-## 🔄 Maintenance
+## 🔄 Sync Status
 
-This fork automatically syncs with upstream weekly to stay current. See [Sync Automation](./docs/sync-automation.md) for technical details.
+This fork automatically syncs with upstream repositories weekly. Last updated:
+
+### Upstream Syncs
+
+- **Main Branch**: Synced with [google-gemini/gemini-cli](https://github.com/google-gemini/gemini-cli)
+
+  - Latest: [`e0fcbc39`](https://github.com/google-gemini/gemini-cli/commit/e0fcbc39f) - Add version specifier to npx command
+  - Synced: Sep 18, 2025
+
+- **Feature Branch**: Synced with [heartyguy/gemini-cli](https://github.com/heartyguy/gemini-cli)
+  - Latest: [`dc9c4957`](https://github.com/heartyguy/gemini-cli/commit/dc9c49578) - Add OpenRouter support for Gemini models
+  - Synced: Sep 18, 2025
+
+See [Sync Automation](./docs/sync-automation.md) for technical details on the automated sync process.
 
 ## 📖 Links
 
