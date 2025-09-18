@@ -1,0 +1,58 @@
+name: Cleanup Old Backup Branches
+
+on:
+  schedule:
+    # Run monthly on the 1st at 3 AM UTC
+    - cron: '0 3 1 * *'
+  workflow_dispatch:
+    inputs:
+      keep_count:
+        description: 'Number of recent backups to keep per branch type'
+        required: false
+        default: '5'
+        type: string
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Cleanup old backup branches
+        run: |
+          KEEP_COUNT=${{ inputs.keep_count || 5 }}
+          echo "🧹 Cleaning up backup branches, keeping last $KEEP_COUNT per type..."
+
+          # Get all backup branches, sort by date, keep most recent
+          for branch_type in "main" "feature"; do
+            echo "Processing $branch_type backups..."
+
+            # Get backup branches for this type, sorted by creation date (newest first)
+            BACKUP_BRANCHES=$(git branch -r | grep "origin/backup/${branch_type}-" | sed 's|origin/||' | sort -r)
+
+            # Count total branches
+            TOTAL_COUNT=$(echo "$BACKUP_BRANCHES" | wc -l)
+
+            if [ "$TOTAL_COUNT" -gt "$KEEP_COUNT" ]; then
+              # Delete branches beyond the keep count
+              BRANCHES_TO_DELETE=$(echo "$BACKUP_BRANCHES" | tail -n +$((KEEP_COUNT + 1)))
+
+              echo "$BRANCHES_TO_DELETE" | while read -r branch; do
+                if [ -n "$branch" ]; then
+                  echo "Deleting old backup branch: $branch"
+                  git push origin --delete "$branch" || echo "Failed to delete $branch"
+                fi
+              done
+            else
+              echo "No cleanup needed for $branch_type (only $TOTAL_COUNT branches, keeping $KEEP_COUNT)"
+            fi
+          done
+
+          echo "✅ Cleanup complete"
