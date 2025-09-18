@@ -1,6 +1,6 @@
 # Gemini CLI
 
-[![Gemini CLI CI](https://github.com/google-gemini/gemini-cli/actions/workflows/ci.yml/badge.svg)](https://github.com/google-gemini/gemini-cli/actions/workflows/ci.yml)
+[![Gemini CLI CI](https://github.com/shrwnsan/gemini-cli-openrouter/actions/workflows/ci.yml/badge.svg)](https://github.com/shrwnsan/gemini-cli-openrouter/actions/workflows/ci.yml)
 
 ![Gemini CLI Screenshot](./docs/assets/gemini-screenshot.png)
 
@@ -79,6 +79,10 @@ gemini
 - If you encounter any issues, review the **[Troubleshooting guide](./docs/troubleshooting.md)**.
 - For more comprehensive documentation, see the [full documentation](./docs/index.md).
 - Take a look at some [popular tasks](#popular-tasks) for more inspiration.
+
+### OpenRouter Support
+
+This fork includes support for using Gemini models through the OpenRouter API, providing an alternative authentication method. See the [OpenRouter guide](./docs/openrouter.md) for details.
 
 ### Troubleshooting
 
