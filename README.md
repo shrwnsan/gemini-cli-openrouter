@@ -118,12 +118,14 @@ This fork automatically syncs with upstream repositories weekly. Last updated:
 
 - **Main Branch**: Synced with [google-gemini/gemini-cli](https://github.com/google-gemini/gemini-cli)
 
-  - Latest: [`e0fcbc39`](https://github.com/google-gemini/gemini-cli/commit/e0fcbc39f) - Add version specifier to npx command
-  - Synced: Sep 18, 2025 15:21 UTC
+  - **Latest**: [`e0fcbc39`](https://github.com/google-gemini/gemini-cli/commit/e0fcbc39f) - Add version specifier to npx command for GCP AR auth (#8653)
+    - **Committed**: Sep 18, 2025 14:47 UTC
+  - **Synced**: Sep 18, 2025 15:21 UTC
 
 - **Feature Branch**: Synced with [heartyguy/gemini-cli](https://github.com/heartyguy/gemini-cli)
-  - Latest: [`dc9c4957`](https://github.com/heartyguy/gemini-cli/commit/dc9c49578) - Add OpenRouter support for Gemini models
-  - Synced: Sep 18, 2025 15:21 UTC
+  - **Latest**: [`dc9c4957`](https://github.com/heartyguy/gemini-cli/commit/dc9c49578) - Add OpenRouter support for Gemini models
+    - **Committed**: June 28, 2025 01:42 UTC
+  - **Synced**: Sep 18, 2025 15:21 UTC
 
 See [Sync Automation](./docs/sync-automation.md) for technical details on the automated sync process.
 
