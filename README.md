@@ -129,6 +129,19 @@ This fork automatically syncs with upstream repositories weekly. Last updated:
 
 See [Sync Automation](./docs/sync-automation.md) for technical details on the automated sync process.
 
+### Manual Sync Triggers
+
+You can also trigger syncs on-demand via GitHub Actions:
+
+1. Go to **Actions** tab in the repository
+2. Select **"Weekly Sync with Upstream"** workflow
+3. Click **"Run workflow"**
+4. Configure options:
+   - **Sync type**: `full`, `main-only`, or `feature-only`
+   - **Create release**: Create a GitHub release after sync
+   - **Create PR**: Create PR if feature updates available
+5. Click **"Run workflow"**
+
 ## 📖 Links
 
 - **[Repository](https://github.com/shrwnsan/gemini-cli-openrouter)** - This fork
