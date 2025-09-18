@@ -10,6 +10,7 @@ The sync automation system provides:
 - **Conflict detection** and notification
 - **Flexible sync options** (full, main-only, feature-only)
 - **GitHub release creation** for major syncs
+- **Automatic PR creation** when feature updates are available
 - **Automatic cleanup** of old backup branches
 
 ## Repository Structure
@@ -37,6 +38,26 @@ upstream/feature/openrouter-support
   - 🔄 Synced with `upstream/feature/openrouter-support`
   - Contains only upstream commit `dc9c49578`
 
+### PR Creation Workflow
+
+When upstream updates their feature branch:
+
+1. **Sync Detection**: Automation detects new commits in upstream/feature
+2. **Feature Sync**: Pulls updates to local feature/openrouter-support branch
+3. **Conflict Check**: Verifies no merge conflicts with main branch
+4. **PR Creation**: Automatically creates PR from feature to main (if `-p` flag used)
+5. **Testing**: Runs build and OpenRouter tests before PR creation
+6. **Notification**: Provides PR link for review and merge
+
+**Manual PR Creation** (if automation fails):
+
+```bash
+# Create PR manually
+gh pr create --title "feat: Update OpenRouter integration from upstream" \
+             --body "Latest updates from upstream OpenRouter implementation" \
+             --base main --head feature/openrouter-support
+```
+
 ## Quick Start
 
 ### 1. Ensure Remotes are Configured
@@ -61,6 +82,12 @@ git fetch --all
 
 # Test sync only main branch
 ./scripts/manual-sync.sh -t main-only -d
+
+# Create PR if feature updates available
+./scripts/manual-sync.sh -p
+
+# Full sync with PR creation and release
+./scripts/manual-sync.sh -r -p
 ```
 
 ## Usage Methods

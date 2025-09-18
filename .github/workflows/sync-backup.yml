@@ -20,6 +20,11 @@ on:
         required: false
         default: false
         type: boolean
+      create_pr:
+        description: 'Create PR if feature updates available'
+        required: false
+        default: false
+        type: boolean
 
 jobs:
   sync:
@@ -50,12 +55,16 @@ jobs:
         env:
           SYNC_TYPE: ${{ github.event.inputs.sync_type || 'full' }}
           CREATE_RELEASE: ${{ github.event.inputs.create_release || 'false' }}
+          CREATE_PR: ${{ github.event.inputs.create_pr || 'false' }}
         run: |
+          CMD="./scripts/manual-sync.sh -t $SYNC_TYPE"
           if [[ "$CREATE_RELEASE" == "true" ]]; then
-            ./scripts/manual-sync.sh -t "$SYNC_TYPE" -r
-          else
-            ./scripts/manual-sync.sh -t "$SYNC_TYPE"
+            CMD="$CMD -r"
           fi
+          if [[ "$CREATE_PR" == "true" ]]; then
+            CMD="$CMD -p"
+          fi
+          eval "$CMD"
 
       - name: Build and test
         run: |

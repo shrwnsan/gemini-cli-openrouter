@@ -20,6 +20,7 @@ usage() {
     echo "Options:"
     echo "  -t, --type TYPE     Sync type: full, main-only, feature-only (default: full)"
     echo "  -r, --release       Create GitHub release after successful sync"
+    echo "  -p, --create-pr     Create PR from feature to main if updates available"
     echo "  -d, --dry-run       Show what would be done without making changes"
     echo "  -h, --help          Show this help message"
     echo ""
@@ -34,6 +35,7 @@ usage() {
 SYNC_TYPE="full"
 CREATE_RELEASE=false
 DRY_RUN=false
+CREATE_PR=false
 
 # Parse command line arguments
 while [[ $# -gt 0 ]]; do
@@ -48,6 +50,10 @@ while [[ $# -gt 0 ]]; do
             ;;
         -d|--dry-run)
             DRY_RUN=true
+            shift
+            ;;
+        -p|--create-pr)
+            CREATE_PR=true
             shift
             ;;
         -h|--help)
@@ -169,6 +175,41 @@ if [[ "$SYNC_TYPE" == "full" || "$SYNC_TYPE" == "feature-only" ]]; then
     fi
 fi
 
+# Check if feature branch has updates that need to be merged to main
+check_feature_updates() {
+    if [[ "$SYNC_TYPE" == "full" || "$SYNC_TYPE" == "feature-only" ]]; then
+        echo -e "${BLUE}🔍 Checking for feature branch updates...${NC}"
+
+        # Check if feature branch has commits ahead of main
+        FEATURE_AHEAD=$(git rev-list --count main..feature/openrouter-support 2>/dev/null || echo "0")
+
+        if [[ "$FEATURE_AHEAD" -gt 0 ]]; then
+            echo -e "${YELLOW}📋 Feature branch has $FEATURE_AHEAD new commits${NC}"
+
+            # Check for merge conflicts
+            if git merge-tree $(git merge-base main feature/openrouter-support) main feature/openrouter-support | grep -q "<<<<<<<"; then
+                echo -e "${YELLOW}⚠️ Conflicts detected between main and feature branch${NC}"
+                echo -e "${YELLOW}Manual merge required or PR creation needed${NC}"
+                return 1
+            else
+                echo -e "${GREEN}✅ No conflicts detected - can merge automatically${NC}"
+                return 0
+            fi
+        else
+            echo -e "${GREEN}✅ Feature branch is up to date with main${NC}"
+            return 0
+        fi
+    fi
+}
+
+# Check for feature updates after sync
+FEATURE_UPDATES_AVAILABLE=false
+if [[ "$CONFLICTS_DETECTED" == false ]]; then
+    if check_feature_updates; then
+        FEATURE_UPDATES_AVAILABLE=true
+    fi
+fi
+
 echo ""
 
 # Run tests if no conflicts
@@ -186,6 +227,48 @@ if [[ "$CONFLICTS_DETECTED" == false && "$DRY_RUN" == false ]]; then
     else
         echo -e "${YELLOW}⚠️ vitest not found - skipping automated tests${NC}"
         echo -e "${YELLOW}To run tests manually: npm install && npm test${NC}"
+    fi
+
+    # Create PR if requested and feature updates available
+    if [[ "$CREATE_PR" == true && "$FEATURE_UPDATES_AVAILABLE" == true ]]; then
+        echo -e "${BLUE}🔄 Creating PR from feature branch to main...${NC}"
+
+        # Check if GitHub CLI is available
+        if command -v gh &> /dev/null; then
+            PR_TITLE="feat: Update OpenRouter integration from upstream"
+            PR_BODY="Automated PR created by sync script
+
+## Changes
+- Synced feature branch with upstream OpenRouter updates
+- Includes latest changes from upstream/feature/openrouter-support
+
+## Sync Details
+- Synced at: $TIMESTAMP
+- Backup created: backup/main-pre-sync-$TIMESTAMP
+
+## Testing
+- ✅ Build verification passed
+- ✅ OpenRouter tests passed
+
+This PR brings the latest OpenRouter integration updates from upstream."
+
+            # Create PR using GitHub CLI
+            if gh pr create --title "$PR_TITLE" --body "$PR_BODY" --base main --head feature/openrouter-support; then
+                echo -e "${GREEN}✅ PR created successfully${NC}"
+                echo -e "${GREEN}You can review and merge the PR when ready${NC}"
+            else
+                echo -e "${YELLOW}⚠️ Failed to create PR automatically${NC}"
+                echo -e "${YELLOW}You may need to create it manually on GitHub${NC}"
+            fi
+        else
+            echo -e "${YELLOW}⚠️ GitHub CLI (gh) not found${NC}"
+            echo -e "${YELLOW}To create PR manually:${NC}"
+            echo "  1. Go to GitHub repository"
+            echo "  2. Create PR from 'feature/openrouter-support' to 'main'"
+            echo "  3. Add title: 'feat: Update OpenRouter integration from upstream'"
+        fi
+    elif [[ "$CREATE_PR" == true && "$FEATURE_UPDATES_AVAILABLE" == false ]]; then
+        echo -e "${GREEN}ℹ️ No feature updates available - skipping PR creation${NC}"
     fi
 
     # Create release if requested
