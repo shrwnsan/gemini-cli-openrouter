@@ -22,3 +22,10 @@ Makefile eol=lf
 *.eot binary
 *.ttf binary
 *.otf binary
+
+# Fork-specific files that should never be auto-merged from upstream
+# These files are customized for this fork and should always require manual review
+README.md merge=ours
+CONTRIBUTING.md merge=ours
+docs/sync-automation.md merge=ours
+docs/openrouter.md merge=ours

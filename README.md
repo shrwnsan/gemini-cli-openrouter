@@ -47,11 +47,20 @@ This fork supports all upstream authentication methods plus OpenRouter:
 
 ```bash
 # 1. Get your API key from https://openrouter.ai
-# 2. Set the environment variable
+# 2. Set the environment variables
 export OPENROUTER_API_KEY="your-openrouter-api-key"
+# Optional: Set custom base URL
+export OPENROUTER_BASE_URL="https://your-custom-endpoint.com/api/v1"
 
 # 3. Run the CLI
 npx https://github.com/shrwnsan/gemini-cli-openrouter
+```
+
+Alternatively, you can add these to a `.env` file in your project root:
+
+```bash
+OPENROUTER_API_KEY=your-openrouter-api-key
+OPENROUTER_BASE_URL=https://your-custom-endpoint.com/api/v1
 ```
 
 ### Other Options
@@ -118,14 +127,29 @@ This fork automatically syncs with upstream repositories weekly. Last updated:
 
 - **Main Branch**: Synced with [google-gemini/gemini-cli](https://github.com/google-gemini/gemini-cli)
 
-  - Latest: [`e0fcbc39`](https://github.com/google-gemini/gemini-cli/commit/e0fcbc39f) - Add version specifier to npx command
-  - Synced: Sep 18, 2025
+  - **Latest**: [`b376df76`](https://github.com/google-gemini/gemini-cli/commit/b376df769) - work (#8720)
+    - **Committed**: Sep 18, 2025 17:45 UTC
+  - **Synced**: Sep 19, 2025 02:14 UTC
 
 - **Feature Branch**: Synced with [heartyguy/gemini-cli](https://github.com/heartyguy/gemini-cli)
-  - Latest: [`dc9c4957`](https://github.com/heartyguy/gemini-cli/commit/dc9c49578) - Add OpenRouter support for Gemini models
-  - Synced: Sep 18, 2025
+  - **Latest**: [`dc9c4957`](https://github.com/heartyguy/gemini-cli/commit/dc9c49578) - Add OpenRouter support for Gemini models
+    - **Committed**: June 28, 2025 01:42 UTC
+  - **Synced**: Sep 18, 2025 15:21 UTC
 
 See [Sync Automation](./docs/sync-automation.md) for technical details on the automated sync process.
+
+### Manual Sync Triggers
+
+You can also trigger syncs on-demand via GitHub Actions:
+
+1. Go to **Actions** tab in the repository
+2. Select **"Weekly Sync with Upstream"** workflow
+3. Click **"Run workflow"**
+4. Configure options:
+   - **Sync type**: `full`, `main-only`, or `feature-only`
+   - **Create release**: Create a GitHub release after sync
+   - **Create PR**: Create PR if feature updates available
+5. Click **"Run workflow"**
 
 ## 📖 Links
 

@@ -335,6 +335,38 @@ Edit `scripts/manual-sync.sh` for custom behavior.
 
 ---
 
+## File Protection During Sync
+
+This fork includes protections to prevent important files from being overwritten during upstream syncs:
+
+### Protected Files
+
+The following files are **protected** and will always require manual review during syncs:
+
+- `README.md` - Fork-specific branding and documentation
+- `CONTRIBUTING.md` - Upstream guidelines (kept 1:1)
+- `docs/sync-automation.md` - Fork sync documentation
+- `docs/openrouter.md` - OpenRouter setup guide
+
+### Protection Mechanisms
+
+1. **Sync Script Checks**: The sync script detects when protected files are affected
+2. **Git Attributes**: `.gitattributes` marks protected files with `merge=ours` strategy
+3. **Manual Review Required**: Protected files always trigger manual conflict resolution
+
+### Handling Protected File Conflicts
+
+When syncs affect protected files:
+
+```bash
+# The sync will stop and show warnings
+git status                    # See conflicted files
+# Edit files to keep fork-specific versions
+git add <resolved-files>      # Stage resolved files
+git commit -m 'Resolve sync conflicts'
+git push origin main
+```
+
 ## Quick Reference
 
 ```bash

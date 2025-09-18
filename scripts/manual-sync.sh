@@ -139,19 +139,38 @@ sync_branch() {
         git checkout "$branch"
         git fetch "$remote"
 
-        # Check for conflicts
+        # Check for conflicts in protected files
         if git merge-tree $(git merge-base HEAD "$remote/$remote_branch") HEAD "$remote/$remote_branch" | grep -q "<<<<<<<"; then
             echo -e "${YELLOW}⚠️ Conflicts detected in $branch branch${NC}"
+
+            # Check if README.md or other fork-specific files have conflicts
+            if git merge-tree $(git merge-base HEAD "$remote/$remote_branch") HEAD "$remote/$remote_branch" | grep -E "(README\.md|CONTRIBUTING\.md)" | grep -q "<<<<<<<"; then
+                echo -e "${RED}🚨 IMPORTANT: Fork-specific files (README.md, CONTRIBUTING.md) have conflicts!${NC}"
+                echo -e "${RED}These files are customized for this fork and should NOT be overwritten by upstream.${NC}"
+                echo -e "${YELLOW}Please resolve conflicts manually and keep our fork-specific versions.${NC}"
+            fi
+
             echo -e "${YELLOW}You will need to resolve conflicts manually${NC}"
 
             # Attempt merge to show conflicts
             git merge "$remote/$remote_branch" --no-edit --no-ff || true
             return 1
         else
-            git merge "$remote/$remote_branch" --no-edit --no-ff
-            git push origin "$branch"
-            echo -e "${GREEN}✅ $branch branch synced successfully${NC}"
-            return 0
+            # Check if protected files would be modified
+            if git diff --name-only HEAD.."$remote/$remote_branch" | grep -E "(README\.md|CONTRIBUTING\.md)" >/dev/null; then
+                echo -e "${RED}🚨 WARNING: Upstream changes affect fork-specific files!${NC}"
+                echo -e "${RED}README.md or CONTRIBUTING.md will be modified by upstream.${NC}"
+                echo -e "${YELLOW}This merge will require manual conflict resolution.${NC}"
+
+                # Force manual merge for protected files
+                git merge "$remote/$remote_branch" --no-edit --no-ff || true
+                return 1
+            else
+                git merge "$remote/$remote_branch" --no-edit --no-ff
+                git push origin "$branch"
+                echo -e "${GREEN}✅ $branch branch synced successfully${NC}"
+                return 0
+            fi
         fi
     else
         echo -e "${YELLOW}Would sync $branch with $remote/$remote_branch${NC}"
@@ -313,6 +332,8 @@ if [[ "$CONFLICTS_DETECTED" == true ]]; then
     if [[ "$SYNC_TYPE" == "full" || "$SYNC_TYPE" == "feature-only" ]]; then
         echo "  backup/feature/openrouter-support-pre-sync-$TIMESTAMP"
     fi
+    # Exit with error code for conflicts
+    exit 1
 else
     echo -e "${GREEN}🎉 Sync completed successfully!${NC}"
     if [[ "$DRY_RUN" == false ]]; then
@@ -324,4 +345,6 @@ else
             echo -e "${GREEN}  backup/feature/openrouter-support-pre-sync-$TIMESTAMP${NC}"
         fi
     fi
+    # Exit successfully
+    exit 0
 fi

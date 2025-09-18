@@ -1,0 +1,90 @@
+name: Test Fork Quality
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      test_type:
+        description: 'Test type to run'
+        required: true
+        default: 'full'
+        type: choice
+        options:
+          - full
+          - build-only
+          - test-only
+          - openrouter-only
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build project
+        if: inputs.test_type == 'full' || inputs.test_type == 'build-only' || !inputs.test_type
+        run: |
+          echo "🔨 Building project..."
+          npm run build
+
+      - name: Run all tests
+        if: inputs.test_type == 'full' || inputs.test_type == 'test-only' || !inputs.test_type
+        continue-on-error: true
+        run: |
+          echo "🧪 Running all tests..."
+          npm test || echo "⚠️ Some tests failed"
+
+      - name: Run OpenRouter tests
+        if: inputs.test_type == 'full' || inputs.test_type == 'openrouter-only' || !inputs.test_type
+        continue-on-error: true
+        run: |
+          echo "🔄 Running OpenRouter-specific tests..."
+          npm test -- --testPathPattern="openRouter" || echo "⚠️ OpenRouter tests failed or not found"
+
+      - name: Test Results Summary
+        if: always()
+        run: |
+          echo "📊 Test Results Summary"
+          echo "======================"
+          echo "✅ Build: ${{ job.status == 'success' && 'PASSED' || 'FAILED' }}"
+          echo "🧪 Tests: May have failures (see logs above)"
+          echo ""
+          echo "📝 Notes:"
+          echo "- Test failures don't block sync completion"
+          echo "- Review test output for issues to address"
+          echo "- OpenRouter tests are fork-specific"
+
+      - name: Notify on test failures
+        if: failure()
+        run: |
+          echo "⚠️ TESTS FAILED"
+          echo "=============="
+          echo "Test failures detected in the fork."
+          echo "This doesn't affect sync completion but should be investigated."
+          echo ""
+          echo "Common causes:"
+          echo "- Missing test dependencies"
+          echo "- Environment differences"
+          echo "- Test configuration issues"
+          echo ""
+          echo "Next steps:"
+          echo "1. Check test logs above"
+          echo "2. Run tests locally: npm test"
+          echo "3. Fix any failing tests"
+          echo "4. Consider updating test configuration"

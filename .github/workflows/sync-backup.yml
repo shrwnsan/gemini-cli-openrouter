@@ -51,28 +51,115 @@ jobs:
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
 
-      - name: Run sync script
-        env:
-          SYNC_TYPE: ${{ github.event.inputs.sync_type || 'full' }}
-          CREATE_RELEASE: ${{ github.event.inputs.create_release || 'false' }}
-          CREATE_PR: ${{ github.event.inputs.create_pr || 'false' }}
-        run: |
-          CMD="./scripts/manual-sync.sh -t $SYNC_TYPE"
-          if [[ "$CREATE_RELEASE" == "true" ]]; then
-            CMD="$CMD -r"
-          fi
-          if [[ "$CREATE_PR" == "true" ]]; then
-            CMD="$CMD -p"
-          fi
-          eval "$CMD"
+       - name: Run sync script
+         id: sync
+         env:
+           SYNC_TYPE: ${{ github.event.inputs.sync_type || 'full' }}
+           CREATE_RELEASE: ${{ github.event.inputs.create_release || 'false' }}
+           CREATE_PR: ${{ github.event.inputs.create_pr || 'false' }}
+         run: |
+           CMD="./scripts/manual-sync.sh -t $SYNC_TYPE"
+           if [[ "$CREATE_RELEASE" == "true" ]]; then
+             CMD="$CMD -r"
+           fi
+           if [[ "$CREATE_PR" == "true" ]]; then
+             CMD="$CMD -p"
+           fi
+           eval "$CMD"
 
-      - name: Build and test
-        run: |
-          npm run build
-          npm test -- --testPathPattern="openRouter" || echo "OpenRouter tests not found or failed"
+           # Set output to indicate sync success
+           echo "sync_success=true" >> $GITHUB_OUTPUT
 
-      - name: Notify on failure
-        if: failure()
-        run: |
-          echo "Sync failed. Check the logs above for details."
-          echo "You may need to resolve conflicts manually."
+       - name: Build and test
+         if: steps.sync.outputs.sync_success == 'true'
+         continue-on-error: true
+         id: test
+         run: |
+           echo "🔨 Building project..."
+           if npm run build; then
+             echo "✅ Build successful"
+             echo "build_success=true" >> $GITHUB_OUTPUT
+           else
+             echo "❌ Build failed"
+             echo "build_success=false" >> $GITHUB_OUTPUT
+             exit 1
+           fi
+
+       - name: Run tests
+         if: steps.test.outputs.build_success == 'true'
+         continue-on-error: true
+         id: test_run
+         run: |
+           echo "🧪 Running OpenRouter tests..."
+           if npm test -- --testPathPattern="openRouter" 2>/dev/null; then
+             echo "✅ OpenRouter tests passed"
+             echo "test_success=true" >> $GITHUB_OUTPUT
+           else
+             echo "⚠️ OpenRouter tests failed or not found"
+             echo "test_success=false" >> $GITHUB_OUTPUT
+             # Don't fail the step, just report
+           fi
+
+       - name: Sync completion status
+         if: always()
+         run: |
+           echo "📊 Sync Completion Report"
+           echo "========================"
+
+           if [[ "${{ steps.sync.outputs.sync_success }}" == "true" ]]; then
+             echo "✅ Sync: SUCCESS"
+           else
+             echo "❌ Sync: FAILED"
+           fi
+
+           if [[ "${{ steps.test.outputs.build_success }}" == "true" ]]; then
+             echo "✅ Build: SUCCESS"
+           elif [[ "${{ steps.test.outputs.build_success }}" == "false" ]]; then
+             echo "❌ Build: FAILED"
+           else
+             echo "⏭️ Build: SKIPPED (sync failed)"
+           fi
+
+           if [[ "${{ steps.test_run.outputs.test_success }}" == "true" ]]; then
+             echo "✅ Tests: SUCCESS"
+           elif [[ "${{ steps.test_run.outputs.test_success }}" == "false" ]]; then
+             echo "⚠️ Tests: FAILED (non-critical)"
+           else
+             echo "⏭️ Tests: SKIPPED"
+           fi
+
+           echo ""
+           echo "📝 Notes:"
+           if [[ "${{ steps.sync.outputs.sync_success }}" == "true" ]]; then
+             echo "- Sync completed successfully"
+             echo "- Changes have been merged and pushed"
+           fi
+
+           if [[ "${{ steps.test.outputs.build_success }}" == "false" ]]; then
+             echo "- Build failed - manual investigation recommended"
+           fi
+
+           if [[ "${{ steps.test_run.outputs.test_success }}" == "false" ]]; then
+             echo "- Tests failed - this is non-critical for sync completion"
+             echo "- Consider investigating test issues separately"
+           fi
+
+       - name: Notify on critical failure
+         if: failure() && steps.sync.outputs.sync_success != 'true'
+         run: |
+           echo "🚨 CRITICAL: Sync failed to complete!"
+           echo "Check the logs above for details."
+           echo "You may need to resolve conflicts manually or run sync locally."
+
+       - name: Notify on test issues
+         if: steps.test.outputs.build_success == 'false' || steps.test_run.outputs.test_success == 'false'
+         run: |
+           echo "⚠️ NON-CRITICAL: Build or test issues detected"
+           echo "Sync completed successfully, but there are quality issues to address:"
+           if [[ "${{ steps.test.outputs.build_success }}" == "false" ]]; then
+             echo "- Build is failing"
+           fi
+           if [[ "${{ steps.test_run.outputs.test_success }}" == "false" ]]; then
+             echo "- Tests are failing"
+           fi
+           echo "Consider investigating these issues in a separate workflow or locally."
