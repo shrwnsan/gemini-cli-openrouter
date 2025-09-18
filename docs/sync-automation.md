@@ -19,11 +19,23 @@ google-gemini/main ──────────────┐
     ↓ (sync)                     │
 main (your fork) ────────────────┼─► origin/main
     │                            │
-    ↓ (feature branch)           │
+    ↓ (feature branch - mirror)  │
 feature/openrouter-support ──────┘
     ↓ (sync)
 upstream/feature/openrouter-support
 ```
+
+### Branch Strategy
+
+- **Main Branch**: Contains OpenRouter integration + sync automation
+
+  - ✅ **Backed up** before sync operations
+  - 🔄 Synced with `google-gemini/main`
+
+- **Feature Branch**: Pure mirror of upstream OpenRouter implementation
+  - ❌ **Not backed up** (recreatable from upstream)
+  - 🔄 Synced with `upstream/feature/openrouter-support`
+  - Contains only upstream commit `dc9c49578`
 
 ## Quick Start
 
@@ -108,12 +120,14 @@ git fetch --all
 ### Sync Process
 
 1. **Create Backups**: Backup branches are created with timestamp
+
    - `backup/main-pre-sync-YYYYMMDD-HHMMSS`
    - `backup/feature-pre-sync-YYYYMMDD-HHMMSS`
 
 2. **Conflict Detection**: System checks for merge conflicts before attempting sync
 
 3. **Sync Operation**:
+
    - Main branch: Merges with `google-gemini/main`
    - Feature branch: Merges with `upstream/feature/openrouter-support`
 
