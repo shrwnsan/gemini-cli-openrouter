@@ -85,7 +85,7 @@ export class BaseLlmClient {
       ...this.defaultUtilityConfig,
       ...options.config,
       ...(systemInstruction && { systemInstruction }),
-      responseJsonSchema: schema,
+      responseSchema: schema,
       responseMimeType: 'application/json',
     };
 

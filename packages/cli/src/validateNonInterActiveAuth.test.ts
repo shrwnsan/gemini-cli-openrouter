@@ -125,6 +125,20 @@ describe('validateNonInterActiveAuth', () => {
     expect(refreshAuthMock).toHaveBeenCalledWith(AuthType.USE_GEMINI);
   });
 
+  it('uses USE_OPENROUTER if OPENROUTER_API_KEY is set', async () => {
+    process.env['OPENROUTER_API_KEY'] = 'fake-key';
+    const nonInteractiveConfig = {
+      refreshAuth: refreshAuthMock,
+    };
+    await validateNonInteractiveAuth(
+      undefined,
+      undefined,
+      nonInteractiveConfig,
+      mockSettings,
+    );
+    expect(refreshAuthMock).toHaveBeenCalledWith(AuthType.USE_OPENROUTER);
+  });
+
   it('uses USE_VERTEX_AI if GOOGLE_GENAI_USE_VERTEXAI is true (with GOOGLE_CLOUD_PROJECT and GOOGLE_CLOUD_LOCATION)', async () => {
     process.env['GOOGLE_GENAI_USE_VERTEXAI'] = 'true';
     process.env['GOOGLE_CLOUD_PROJECT'] = 'test-project';

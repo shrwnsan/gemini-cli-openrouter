@@ -1,10 +1,10 @@
 {
-  "name": "@google/gemini-cli-core",
+  "name": "@shrwnsan/gemini-cli-core",
   "version": "0.7.0-nightly.20250918.2722473a",
-  "description": "Gemini CLI Core",
+  "description": "Gemini CLI Core with OpenRouter support",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/google-gemini/gemini-cli.git"
+    "url": "git+https://github.com/shrwnsan/gemini-cli-openrouter.git"
   },
   "type": "module",
   "main": "dist/index.js",
@@ -74,7 +74,7 @@
     "node-pty": "^1.0.0"
   },
   "devDependencies": {
-    "@google/gemini-cli-test-utils": "file:../test-utils",
+    "@shrwnsan/gemini-cli-test-utils": "file:../test-utils",
     "@types/diff": "^7.0.2",
     "@types/dotenv": "^6.1.1",
     "@types/fast-levenshtein": "^0.0.4",

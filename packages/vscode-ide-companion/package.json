@@ -1,13 +1,13 @@
 {
-  "name": "gemini-cli-vscode-ide-companion",
-  "displayName": "Gemini CLI Companion",
-  "description": "Enable Gemini CLI with direct access to your IDE workspace.",
+  "name": "gemini-cli-openrouter-vscode-ide-companion",
+  "displayName": "Gemini CLI OpenRouter Companion",
+  "description": "Enable Gemini CLI with OpenRouter support and direct access to your IDE workspace.",
   "version": "0.7.0-nightly.20250918.2722473a",
-  "publisher": "google",
+  "publisher": "shrwnsan",
   "icon": "assets/icon.png",
   "repository": {
     "type": "git",
-    "url": "https://github.com/google-gemini/gemini-cli.git",
+    "url": "https://github.com/shrwnsan/gemini-cli-openrouter.git",
     "directory": "packages/vscode-ide-companion"
   },
   "engines": {

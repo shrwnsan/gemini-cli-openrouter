@@ -97,6 +97,12 @@ class GeminiAgent {
         name: 'Vertex AI',
         description: null,
       },
+      {
+        id: AuthType.USE_OPENROUTER,
+        name: 'Use OpenRouter',
+        description:
+          'Requires setting the `OPENROUTER_API_KEY` environment variable',
+      },
     ];
 
     return {

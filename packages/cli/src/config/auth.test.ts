@@ -74,6 +74,20 @@ describe('validateAuthMethod', () => {
     });
   });
 
+  describe('USE_OPENROUTER', () => {
+    it('should return null if OPENROUTER_API_KEY is set', () => {
+      vi.stubEnv('OPENROUTER_API_KEY', 'test-key');
+      expect(validateAuthMethod(AuthType.USE_OPENROUTER)).toBeNull();
+    });
+
+    it('should return an error message if OPENROUTER_API_KEY is not set', () => {
+      vi.stubEnv('OPENROUTER_API_KEY', undefined);
+      expect(validateAuthMethod(AuthType.USE_OPENROUTER)).toBe(
+        'OPENROUTER_API_KEY environment variable not found. Add that to your environment and try again (no reload needed if using .env)!',
+      );
+    });
+  });
+
   it('should return an error message for an invalid auth method', () => {
     expect(validateAuthMethod('invalid-method')).toBe(
       'Invalid auth method selected.',

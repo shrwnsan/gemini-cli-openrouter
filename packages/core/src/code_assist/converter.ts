@@ -99,9 +99,23 @@ export interface CaCountTokenResponse {
 export function toCountTokenRequest(
   req: CountTokensParameters,
 ): CaCountTokenRequest {
+  const isOpenRouter =
+    process.env['OPENROUTER_BASE_URL'] || process.env['OPENROUTER_API_KEY'];
+  console.log('🔄 DEBUG: toCountTokenRequest - isOpenRouter:', isOpenRouter);
+  console.log(
+    '🔄 DEBUG: OPENROUTER_BASE_URL:',
+    process.env['OPENROUTER_BASE_URL'],
+  );
+  console.log(
+    '🔄 DEBUG: OPENROUTER_API_KEY set:',
+    !!process.env['OPENROUTER_API_KEY'],
+  );
+  console.log('🔄 DEBUG: Original model:', req.model);
+  const model = isOpenRouter ? req.model : 'models/' + req.model;
+  console.log('🔄 DEBUG: Final model:', model);
   return {
     request: {
-      model: 'models/' + req.model,
+      model,
       contents: toContents(req.contents),
     },
   };
@@ -273,7 +287,6 @@ function toVertexGenerationConfig(
     seed: config.seed,
     responseMimeType: config.responseMimeType,
     responseSchema: config.responseSchema,
-    responseJsonSchema: config.responseJsonSchema,
     routingConfig: config.routingConfig,
     modelSelectionConfig: config.modelSelectionConfig,
     responseModalities: config.responseModalities,

@@ -101,7 +101,17 @@ export const AboutBox: React.FC<AboutBoxProps> = ({
       </Box>
       <Box>
         <Text color={theme.text.primary}>
-          {selectedAuthType.startsWith('oauth') ? 'OAuth' : selectedAuthType}
+          {selectedAuthType.startsWith('oauth')
+            ? 'OAuth'
+            : selectedAuthType === 'openrouter'
+              ? 'OpenRouter'
+              : selectedAuthType === 'gemini-api-key'
+                ? 'Gemini API Key'
+                : selectedAuthType === 'vertex-ai'
+                  ? 'Vertex AI'
+                  : selectedAuthType === 'cloud-shell'
+                    ? 'Cloud Shell'
+                    : selectedAuthType}
         </Text>
       </Box>
     </Box>
