@@ -33,16 +33,16 @@ upstream/feature/openrouter-support
   - ✅ **Backed up** before sync operations
   - 🔄 Synced with `google-gemini/main`
 
-- **Feature Branch**: Pure mirror of upstream OpenRouter implementation
+- **Feature Branch**: Pure mirror of heartyguy's OpenRouter implementation
   - ❌ **Not backed up** (recreatable from upstream)
-  - 🔄 Synced with `upstream/feature/openrouter-support`
+  - 🔄 Synced with `upstream/feature/openrouter-support` (heartyguy/gemini-cli)
   - Contains only upstream commit `dc9c49578`
 
 ### PR Creation Workflow
 
-When upstream updates their feature branch:
+When heartyguy updates their feature branch:
 
-1. **Sync Detection**: Automation detects new commits in upstream/feature
+1. **Sync Detection**: Automation detects new commits in upstream/feature (heartyguy/gemini-cli)
 2. **Feature Sync**: Pulls updates to local feature/openrouter-support branch
 3. **Conflict Check**: Verifies no merge conflicts with main branch
 4. **PR Creation**: Automatically creates PR from feature to main (if `-p` flag used)
@@ -156,7 +156,7 @@ git fetch --all
 3. **Sync Operation**:
 
    - Main branch: Merges with `google-gemini/main`
-   - Feature branch: Merges with `upstream/feature/openrouter-support`
+   - Feature branch: Merges with `upstream/feature/openrouter-support` (heartyguy/gemini-cli)
 
 4. **Testing**: Runs OpenRouter-specific tests to ensure functionality
 

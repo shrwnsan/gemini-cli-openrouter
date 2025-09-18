@@ -33,6 +33,7 @@ This documentation is organized into the following sections:
   - **[Web Search Tool](./tools/web-search.md):** Documentation for the `google_web_search` tool.
   - **[Memory Tool](./tools/memory.md):** Documentation for the `save_memory` tool.
 - **[Contributing & Development Guide](../CONTRIBUTING.md):** Information for contributors and developers, including setup, building, testing, and coding conventions.
+- **[Sync Automation](./sync-automation.md):** Automated system for keeping your fork updated with upstream changes.
 - **[NPM](./npm.md):** Details on how the project's packages are structured
 - **[Troubleshooting Guide](./troubleshooting.md):** Find solutions to common problems and FAQs.
 - **[Terms of Service and Privacy Notice](./tos-privacy.md):** Information on the terms of service and privacy notices applicable to your use of Gemini CLI.
